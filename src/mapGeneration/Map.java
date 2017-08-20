@@ -430,7 +430,6 @@ public class Map {
 		if (lastRdm == rdm){
 			lastRdm = rdm;
 			rdm = random.nextInt(4);
-			//System.out.println("TRIGGERED");
 			isSameRdm(lastRdm, rdm);
 		} 
 		return rdm;

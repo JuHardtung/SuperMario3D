@@ -27,6 +27,7 @@ import fontRendering.TextMaster;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import mapGeneration.Map;
+import menuGeneration.MenuOptions;
 import models.RawModel;
 import models.TexturedModel;
 import renderEngine.DisplayManager;
@@ -96,38 +97,41 @@ public class MainGameLoop {
 //		guis.add(reflection);
 		
 		//Font GUI
-		FontType marioFont = new FontType(loader.loadFontTextureAtlas("/fonts/superMarioFont2"), new File("res/fonts/superMarioFont2.fnt"));
+//		FontType marioFont = new FontType(loader.loadFontTextureAtlas("/fonts/superMarioFont2"), new File("res/fonts/superMarioFont2.fnt"));
+//		
+//		GUIText optionsButton = new GUIText("Options", 1, marioFont, new Vector2f(0.33f, 0.25f), 0.16f, true, new Vector2f(0.33f,0.04f)) {
+//			
+//			@Override
+//			public void whileHovering() {
+//				System.out.println("WhileHovering");
+//			}
+//			
+//			@Override
+//			public void onStopHover() {
+//				System.out.println("StopHover");
+//				setFontSize(-0.4f);
+//				
+//			}
+//			
+//			@Override
+//			public void onStartHover() {
+//				System.out.println("StartHover");
+//				setFontSize(0.4f);
+//			}
+//			
+//			@Override
+//			public void onClick() {
+//				System.out.println("OnClick");
+//
+//			}
+//		};
 		
-		GUIText optionsButton = new GUIText("Options", 1, marioFont, new Vector2f(0.33f, 0.25f), 0.16f, true, new Vector2f(0.33f,0.04f));
-		GUIText levelsButton = new GUIText("Levels", 1, marioFont, new Vector2f(0.33f, 0.35f), 0.33f, true, new Vector2f(0.33f,0.04f));
-
+		MenuOptions menu = new MenuOptions();
 		
-		//BUTTON TESTING
+		List<GUIText> menuList = menu.generateESCMenu();
+		List<GUIText> levelsList = menu.generateLevelsGui();				
 		
-		AbstractButton testButton  = new AbstractButton(loader, "Options", new Vector2f(0.5f,0.75f), new Vector2f(1.0f,0.128f)) {
-			
-			@Override
-			public void whileHovering(IButton button) {
-				
-			}
-			
-			@Override
-			public void onStopHover(IButton button) {
-				button.resetScale();
-				//text.setTextString(" ", 1, font, new Vector2f(0.5f, 0.5f), 1f, true);
-			}
-			
-			@Override
-			public void onStartHover(IButton button) {
-				button.playHoverAnimation(0.092f);
-				//text.setTextString("Hovering", 1, font, new Vector2f(0.5f, 0.5f), 1f, true);
-			}
-			
-			@Override
-			public void onClick(IButton button) {
-				//text.setTextString("Loading new Map!!!", 1, font, new Vector2f(0.5f, 0.5f), 1f, true);
-			}
-		};
+		//GUIText levelsButton = new GUIText("Levels", 1, marioFont, new Vector2f(0.33f, 0.35f), 0.33f, true, new Vector2f(0.33f,0.04f));
 				
 		
 		/*################################################
@@ -201,26 +205,67 @@ public class MainGameLoop {
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
+			//buttons
+
 			while(Keyboard.next()) {
-				if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-					if(optionsButton.isHidden()) {
-						optionsButton.show();
-					} else {
-						optionsButton.hide();
+			// SHOW MENU IF NOTHING IS SHOWING + ESC PRESSED
+				if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && menuList.get(0).isHidden() && levelsList.get(0).isHidden()) {
+					
+					for(GUIText guiParts:menuList) {
+					guiParts.show();
+					guiParts.setIsHidden(false);
 					}
-					if(levelsButton.isHidden()) {
-						levelsButton.show();
-					} else {
-						levelsButton.hide();
+					
+			//HIDE EVERYTHING IF ANYTHING IS SHOWING + ESC PRESSED
+				} else if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && (!menuList.get(0).isHidden() || !levelsList.get(0).isHidden())) {
+
+					for(GUIText guiParts:menuList) {
+					guiParts.hide();
+					guiParts.setIsHidden(true);
+					}
+					for(GUIText guiParts:levelsList) {
+					guiParts.hide();
+					guiParts.setIsHidden(true);
 					}
 				}
 			}
-			
-			//buttons
-			testButton.update();
-			optionsButton.update();
-			levelsButton.update();
-			
+
+			// show LEVELS + hide MENU if MENU.LEVELS is clicked + MENU showing + LEVELS hidden
+			if(!menuList.get(0).isHidden() && levelsList.get(0).isHidden() && menuList.get(1).isClicked()) {
+
+				for(GUIText guiParts:menuList) {
+				guiParts.hide();
+				guiParts.setIsHidden(true);
+				}
+				for(GUIText guiParts:levelsList) {
+				guiParts.show();
+				guiParts.setIsHidden(false);
+				
+				menuList.get(1).setClicked(false);
+				}
+				
+			// show MENU + hide LEVELS if LEVELS.BACK is clicked + LEVELS showing + MENU hidden
+			} else if(menuList.get(0).isHidden() && !levelsList.get(0).isHidden() && levelsList.get(3).isClicked()) {
+
+				for(GUIText guiParts:menuList) {
+				guiParts.show();
+				guiParts.setIsHidden(false);
+				}
+				for(GUIText guiParts:levelsList) {
+				guiParts.hide();
+				guiParts.setIsHidden(true);
+				}
+				levelsList.get(3).setClicked(false);
+			}
+
+				
+			for(GUIText guiParts5:menuList) {
+				guiParts5.update();
+			}
+			for(GUIText guiParts6:levelsList) {
+				guiParts6.update();
+			}
+				
 			//reflection texture
 			buffers.bindReflectionFrameBuffer();
 			float distance = 2*(camera.getPosition().y - waters.get(0).getHeight());

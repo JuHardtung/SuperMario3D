@@ -2,6 +2,7 @@ package fontMeshCreator;
  
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
@@ -15,7 +16,7 @@ import renderEngine.DisplayManager;
 /**
  * Represents a piece of text in the game.
  */
-public class GUIText{
+public abstract class GUIText implements FontButton{
  
     private String textString;
     private float fontSize;
@@ -27,16 +28,17 @@ public class GUIText{
     private Vector2f position;
     private float lineMaxSize;
     private int numberOfLines;
- 
+     
     private FontType font;
  
     private boolean centerText = false;
     private Vector2f scale;
     
 	private boolean isHidden = true, isHovering = false;
+	public boolean isClicked = false;
 
- 
-    /**
+
+	/**
      * Creates a new text, loads the text's quads into a VAO, and adds the text
      * to the screen.
      * 
@@ -73,8 +75,9 @@ public class GUIText{
     }
     
     public void update() {
+    	
     	if(!isHidden) {
-    		    		
+   		
     		float mouseX = (float) Mouse.getX() / (float) Display.getWidth();
     		float mouseY = 1 - (float) Mouse.getY() / (float) Display.getHeight();
     		
@@ -90,8 +93,6 @@ public class GUIText{
 //    		System.out.println("scaleY: " + scale.y);
 //    		System.out.println("__________________________________");
 
-
-
 			if(position.x < mouseX 						//top border
 				&& position.x + scale.x > mouseX 		//bottom border
 				&& position.y < mouseY  				//left border
@@ -105,6 +106,7 @@ public class GUIText{
 				while(Mouse.next())
 					if(Mouse.isButtonDown(0)) {
 						onClick();
+
 					}
 			
 			}else {
@@ -115,30 +117,6 @@ public class GUIText{
 			}    		
     	}
     }
-    
-	void onClick() {
-		System.out.println("OnClick");
-		
-	};
-	
-	void onStartHover() {
-		System.out.println("StartHover");
-		this.fontSize = fontSize + 0.4f;
-        TextMaster.loadText(this);
-
-		
-	};
-	
-	void onStopHover() {
-		System.out.println("StopHover");
-		this.fontSize = fontSize - 0.4f;
-        TextMaster.loadText(this);
-	};
-	
-	void whileHovering() {
-		System.out.println("WhileHovering");
-
-	};
     
 	public void show() {
 		if(isHidden) {
@@ -158,17 +136,22 @@ public class GUIText{
 		return isHidden;
 	}
 	
-//    public void setTextString(String text, float fontSize, FontType font, Vector2f position, float maxLineLength,
-//            boolean centered) {
-//    	System.out.println("Text wird verändert");
-//		this.textString = text;
-//        this.fontSize = fontSize;
-//        this.font = font;
-//        this.position = position;
-//        this.lineMaxSize = maxLineLength;
-//        this.centerText = centered;
-//		TextMaster.loadText(this);
-//	}
+	public void setIsHidden(boolean hidden) {
+		isHidden = hidden;
+	}
+
+    public boolean isClicked() {
+		return isClicked;
+	}
+
+	public void setClicked(boolean clicked) {
+		isClicked = clicked;
+	}
+	
+    public void setTextString(String text) {
+		this.textString = text;
+		TextMaster.loadText(this);
+	}
     
 	/**
      * Remove the text from the screen.
@@ -183,6 +166,7 @@ public class GUIText{
     public FontType getFont() {
         return font;
     }
+    
  
     /**
      * Set the colour of the text.
@@ -257,6 +241,16 @@ public class GUIText{
      */
     protected float getFontSize() {
         return fontSize;
+    }
+    
+    /**
+     * 
+     * @param size
+     * 				- the desired new fontSize - updated through update() each frame
+     */
+    public void setFontSize(float size) {
+    	fontSize = fontSize + size;
+        //TextMaster.loadText(this);
     }
  
     /**
