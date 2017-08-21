@@ -14,6 +14,7 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import models.TexturedModel;
+import normalMappingRenderer.NormalMappingRenderer;
 import shaders.StaticShader;
 import shadows.ShadowMapMasterRenderer;
 import skybox.SkyboxRenderer;
@@ -27,9 +28,9 @@ public class MasterRenderer {
 	public static final float NEAR_PLANE = 0.1f;
 	public static final float FAR_PLANE = 1000.0f;
 	
-	private static final float RED = 0.37f;
-	private static final float GREEN = 0.58f;
-	private static final float BLUE = 0.98f;
+	public static final float RED = 0.37f;
+	public static final float GREEN = 0.58f;
+	public static final float BLUE = 0.98f;
 
 	
 	private Matrix4f projectionMatrix;
@@ -40,8 +41,12 @@ public class MasterRenderer {
 	private TerrainRenderer terrainRenderer;
 	private TerrainShader terrainShader = new TerrainShader();
 	
+	private NormalMappingRenderer normalMapRenderer;
+	
 	
 	private HashMap<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
+	private HashMap<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel,List<Entity>>();
+
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 	
 	private SkyboxRenderer skyboxRenderer;
@@ -56,31 +61,36 @@ public class MasterRenderer {
 		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
 		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
 		this.shadowMapRenderer = new ShadowMapMasterRenderer(cam);
+		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 	}
 	
 	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
 
-	public void renderScene(List<Entity> entities, Camera camera, Light light, Vector4f clipPlane){
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities, Camera camera, List<Light> lights, Vector4f clipPlane){
 		for (Entity entity:entities){
 			processEntity(entity);
 		}
-		render(light, camera, clipPlane);
+		for (Entity entity:normalEntities){
+			processNormalMapEntity(entity);
+		}
+		render(lights, camera, clipPlane);
 	}
 
-	public void render(Light sun, Camera camera, Vector4f clipPlane){
+	public void render(List<Light> lights, Camera camera, Vector4f clipPlane){
 	
 		prepare();
 		shader.start();
 		shader.loadClipPlane(clipPlane);
 		shader.loadSkyColour(RED, GREEN, BLUE);
-		shader.loadLight(sun);
+		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
 		shader.loadMapSize();
 		shader.loadShadowDistance();
 		renderer.render(entities, shadowMapRenderer.getToShadowMapSpaceMatrix());
 		shader.stop();
+		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
 //		terrainShader.start();
 //		terrainShader.loadLight(sun);
 //		terrainShader.loadViewMatrix(camera);
@@ -89,6 +99,7 @@ public class MasterRenderer {
 		skyboxRenderer.render(camera,RED, GREEN, BLUE);
 		terrains.clear();
 		entities.clear();
+		normalMapEntities.clear();
 		
 	}
 	
@@ -108,6 +119,18 @@ public class MasterRenderer {
 		}
 	}
 	
+	public void processNormalMapEntity(Entity entity){
+		TexturedModel entityModel = entity.getModel();
+		List<Entity> batch = normalMapEntities.get(entityModel);
+		if(batch!=null){
+			batch.add(entity);
+		} else {
+			List<Entity> newBatch = new ArrayList<Entity>();
+			newBatch.add(entity);
+			normalMapEntities.put(entityModel, newBatch);
+		}
+	}
+	
 	public static void enableCulling(){
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glCullFace(GL11.GL_BACK);
@@ -117,8 +140,11 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
-	public void renderShadowMap(List<Entity> entityList, Light sun) {
+	public void renderShadowMap(List<Entity> entityList, List<Entity>  entityNomalList, Light sun) {
 		for(Entity entity : entityList) {
+			processEntity(entity);
+		}
+		for(Entity entity : entityNomalList) {
 			processEntity(entity);
 		}
 		shadowMapRenderer.render(entities, sun);
@@ -133,6 +159,7 @@ public class MasterRenderer {
 		shader.cleanUp();
 		terrainShader.cleanUp();
 		shadowMapRenderer.cleanUp();
+		normalMapRenderer.cleanUp();
 	}
 	
 	public void prepare() {

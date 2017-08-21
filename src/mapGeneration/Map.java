@@ -31,6 +31,7 @@ public class Map {
 	RawModel marioModel = OBJLoader.loadObjModel("models/char_mario", loader);
 	TexturedModel marioTextured = new TexturedModel(marioModel, new ModelTexture(loader.loadGameTextures("models/char_mario")));
 	
+	
 	//BG_MOUNTAIN
 	RawModel mountainModel = OBJLoader.loadObjModel("models/bg_mountain", loader);
 	TexturedModel mountainTextured = new TexturedModel(mountainModel, new ModelTexture(loader.loadGameTextures("models/bg_mountain")));

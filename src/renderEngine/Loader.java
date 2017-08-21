@@ -33,13 +33,25 @@ public class Loader {
 	private List<Integer> textures = new ArrayList<Integer>();
 
 	
-	public RawModel loadToVAO(float[] positions, float[] textureCoords,float[] normals, int[] indices){
+	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals, int[] indices){
 		int vaoID = createVAO();
 		bindIndicesBuffer(indices);
 		storeDataInAttribList(0, 3, positions);
 		storeDataInAttribList(1, 2, textureCoords);
 		storeDataInAttribList(2, 3, normals);
 
+		unbindVAO();
+		return new RawModel(vaoID, indices.length);
+		
+	}
+	
+	public RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals, float[] tangents, int[] indices){
+		int vaoID = createVAO();
+		bindIndicesBuffer(indices);
+		storeDataInAttribList(0, 3, positions);
+		storeDataInAttribList(1, 2, textureCoords);
+		storeDataInAttribList(2, 3, normals);
+		storeDataInAttribList(3, 3, tangents);
 		unbindVAO();
 		return new RawModel(vaoID, indices.length);
 		
@@ -69,7 +81,7 @@ public class Loader {
 			texture = TextureLoader.getTexture("PNG", new FileInputStream("res/"+fileName+".png"));
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
+			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -2.4f);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

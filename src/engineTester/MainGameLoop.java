@@ -30,6 +30,7 @@ import mapGeneration.Map;
 import menuGeneration.MenuOptions;
 import models.RawModel;
 import models.TexturedModel;
+import normalMappingObjConverter.NormalMappedObjLoader;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -60,16 +61,31 @@ public class MainGameLoop {
 		//MARIO
 		
 		RawModel marioModel = OBJLoader.loadObjModel("models/char_mario", loader);
-		TexturedModel marioTextured = new TexturedModel(marioModel, new ModelTexture(loader.loadGameTextures("models/char_mario")));
+		RawModel marioNormalModel = NormalMappedObjLoader.loadOBJ("models/char_mario", loader);
+		TexturedModel marioTexturedNormalModel = new TexturedModel(marioNormalModel, new ModelTexture(loader.loadGameTextures("models/char_mario")));
+		marioTexturedNormalModel.getTexture().setNormalMap(loader.loadGameTextures("models/char_marioNormal"));
+
+
+		TexturedModel marioTexturedModel = new TexturedModel(marioModel, new ModelTexture(loader.loadGameTextures("models/char_mario")));
 		
-		Player player = new Player(marioTextured, new Vector3f(0,0,0),0,0,0,1);	
+		marioTexturedNormalModel.getTexture().setShineDamper(10);
+		marioTexturedNormalModel.getTexture().setReflectivity(0.5f);
+
+		
+		Player player = new Player(marioTexturedNormalModel, new Vector3f(0,0,0),0,0,0,1);	
 		Camera camera = new Camera(player);
 		MasterRenderer renderer = new MasterRenderer(loader, camera);
 
 		
 
 		//LIGHT
-		Light light = new Light(new Vector3f(-300000,200000,-300000), new Vector3f(1,1,1));
+		Light sun = new Light(new Vector3f(-300000,200000,-300000), new Vector3f(1f,1f,1f));
+		List<Light> lights = new ArrayList<Light>();
+		
+		lights.add(sun);
+//		lights.add(new Light(new Vector3f(0,10,0), new Vector3f(10,0,0), new Vector3f(1,0.01f, 0.002f)));
+//		lights.add(new Light(new Vector3f(0,10,25), new Vector3f(0,0,10), new Vector3f(1,0.01f, 0.002f)));
+
 		
 		
 		//WATER
@@ -96,35 +112,7 @@ public class MainGameLoop {
 //		guis.add(refraction);
 //		guis.add(reflection);
 		
-		//Font GUI
-//		FontType marioFont = new FontType(loader.loadFontTextureAtlas("/fonts/superMarioFont2"), new File("res/fonts/superMarioFont2.fnt"));
-//		
-//		GUIText optionsButton = new GUIText("Options", 1, marioFont, new Vector2f(0.33f, 0.25f), 0.16f, true, new Vector2f(0.33f,0.04f)) {
-//			
-//			@Override
-//			public void whileHovering() {
-//				System.out.println("WhileHovering");
-//			}
-//			
-//			@Override
-//			public void onStopHover() {
-//				System.out.println("StopHover");
-//				setFontSize(-0.4f);
-//				
-//			}
-//			
-//			@Override
-//			public void onStartHover() {
-//				System.out.println("StartHover");
-//				setFontSize(0.4f);
-//			}
-//			
-//			@Override
-//			public void onClick() {
-//				System.out.println("OnClick");
-//
-//			}
-//		};
+
 		
 		MenuOptions menu = new MenuOptions();
 		
@@ -163,8 +151,11 @@ public class MainGameLoop {
 		List<Entity> wallBlocks = map.generateWalls();
 
 		List<Entity> entities = new ArrayList<Entity>();
-		
-		entities.add(player);
+		List<Entity> normalMapEntities = new ArrayList<Entity>();
+				
+		normalMapEntities.add(player);
+		//entities.add(player);
+
 		
 		for(Entity entity:allFloorBlocks){
 			entities.add(entity);
@@ -198,7 +189,7 @@ public class MainGameLoop {
 			camera.move();
 			player.move();
 			
-			renderer.renderShadowMap(entities, light);
+			renderer.renderShadowMap(entities, normalMapEntities, sun);
 			AudioMaster.setListenerData(player.getPosition().x,player.getPosition().y,player.getPosition().z);
 			
 			//gumbaAudio.setPosition(player.getPosition().x, player.getPosition().y, player.getPosition().z);
@@ -271,21 +262,18 @@ public class MainGameLoop {
 			float distance = 2*(camera.getPosition().y - waters.get(0).getHeight());
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
-			renderer.processEntity(player);
-			renderer.renderScene(entities, camera, light, new Vector4f(0,1,0, -waters.get(0).getHeight()));
+			renderer.renderScene(entities, normalMapEntities, camera, lights, new Vector4f(0,1,0, -waters.get(0).getHeight()));
 			camera.getPosition().y += distance;
 			camera.invertPitch();
 			
 			//refraction texture
 			buffers.bindRefractionFrameBuffer();
-			renderer.processEntity(player);
-			renderer.renderScene(entities, camera, light, new Vector4f(0, -1, 0, waters.get(0).getHeight()));
+			renderer.renderScene(entities, normalMapEntities, camera, lights, new Vector4f(0, -1, 0, waters.get(0).getHeight()));
 		
 			//render to Screen
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			buffers.unbindCurrentFrameBuffer();
-			renderer.processEntity(player);
-			renderer.renderScene(entities, camera, light, new Vector4f(0,-1,0,100000));
+			renderer.renderScene(entities, normalMapEntities, camera, lights, new Vector4f(0,-1,0,100000));
 			for(WaterTile waterTiles : waters){
 				waterRenderer.render(waters,camera);
 			}
