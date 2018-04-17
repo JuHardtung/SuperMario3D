@@ -6,28 +6,16 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
-import renderEngine.DisplayManager;
 import renderEngine.MasterRenderer;
 
-/**
- * Represents the 3D cuboidal area of the world in which objects will cast
- * shadows (basically represents the orthographic projection area for the shadow
- * render pass). It is updated each frame to optimise the area, making it as
- * small as possible (to allow for optimal shadow map resolution) while not
- * being too small to avoid objects not having shadows when they should.
- * Everything inside the cuboidal area represented by this object will be
- * rendered to the shadow map in the shadow render pass. Everything outside the
- * area won't be.
- * 
- * @author Karl
- *
- */
+import static tools.Constants.OFFSET;
+import static tools.Constants.SHADOW_DISTANCE;
+import static tools.Constants.UNIT_UP;
+import static tools.Constants.UNIT_FORWARD;
+
+
 public class ShadowBox {
 
-	private static final float OFFSET = 30;
-	private static final Vector4f UP = new Vector4f(0, 1, 0, 0);
-	private static final Vector4f FORWARD = new Vector4f(0, 0, -1, 0);
-	private static final float SHADOW_DISTANCE = 600.0f;
 
 	private float minX, maxX;
 	private float minY, maxY;
@@ -64,7 +52,7 @@ public class ShadowBox {
 	 */
 	protected void update() {
 		Matrix4f rotation = calculateCameraRotationMatrix();
-		Vector3f forwardVector = new Vector3f(Matrix4f.transform(rotation, FORWARD, null));
+		Vector3f forwardVector = new Vector3f(Matrix4f.transform(rotation, UNIT_FORWARD, null));
 
 		Vector3f toFar = new Vector3f(forwardVector);
 		toFar.scale(SHADOW_DISTANCE);
@@ -167,7 +155,7 @@ public class ShadowBox {
 	 */
 	private Vector4f[] calculateFrustumVertices(Matrix4f rotation, Vector3f forwardVector,
 			Vector3f centerNear, Vector3f centerFar) {
-		Vector3f upVector = new Vector3f(Matrix4f.transform(rotation, UP, null));
+		Vector3f upVector = new Vector3f(Matrix4f.transform(rotation, UNIT_UP, null));
 		Vector3f rightVector = Vector3f.cross(forwardVector, upVector, null);
 		Vector3f downVector = new Vector3f(-upVector.x, -upVector.y, -upVector.z);
 		Vector3f leftVector = new Vector3f(-rightVector.x, -rightVector.y, -rightVector.z);

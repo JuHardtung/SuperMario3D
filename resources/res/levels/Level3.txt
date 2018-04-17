@@ -1,0 +1,32 @@
+12					
+11					
+10					
+9					
+8					
+7					
+6					
+5					
+4					
+3					
+2					
+1		B	B				
+0			
+X 					
+					
+					
+					
+					
+					
+			B = Brick		
+			F = Floor		
+			Q = Question		
+			W = Wall		
+			DB = Dark Brick		
+			DF = Dark Floor		
+			DQ = Dark Question		
+			DW = Dark Wall		
+			IR = Item Red		
+			IG = Item Green		
+			P = Pipes		
+			G = Gumba		
+			DG = Dark Gumba		

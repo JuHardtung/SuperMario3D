@@ -9,11 +9,11 @@ public class Camera {
 	private float distanceFromPlayer = 100;
 	private float angleAroundPlayer = 0;
 	
-
 	private Vector3f position = new Vector3f(80,20,0);
 	private float pitch = 15;
 	private float yaw;
 	private float roll;
+	private float cameraOffsetY;
 	
 	private Player player;
 	
@@ -31,16 +31,18 @@ public class Camera {
 		this.yaw = 180 - (player.getRotY() + angleAroundPlayer);
 		
 		//CLASSIC PERSPECTIVE
-		if (Keyboard.isKeyDown(Keyboard.KEY_T)){
+		if (Keyboard.isKeyDown(Keyboard.KEY_E)){
 			angleAroundPlayer = 90;
 			pitch = 0;
-			distanceFromPlayer = 400;
+			distanceFromPlayer = 180;
+			cameraOffsetY = 70;
 		}
 		//3D PERSPECTIVE
-		if (Keyboard.isKeyDown(Keyboard.KEY_Z)){
+		if (Keyboard.isKeyDown(Keyboard.KEY_R)){
 			angleAroundPlayer = 0;
 			pitch = 15;
 			distanceFromPlayer = 100;
+			cameraOffsetY = 0;
 		}
 		/*System.out.println("YAW: " + yaw);
 		System.out.println("PITCH: " + pitch);
@@ -72,9 +74,10 @@ public class Camera {
 		float theta = player.getRotY() + angleAroundPlayer;
 		float offsetX = (float) (horizDistance * Math.sin(Math.toRadians(theta)));
 		float offsetZ = (float) (horizDistance * Math.cos(Math.toRadians(theta)));
+		float offsetY = (float) (verticDistance + cameraOffsetY);
 		position.x = player.getPosition().x - offsetX;
+		position.y = player.getPosition().y + offsetY;
 		position.z = player.getPosition().z - offsetZ;
-		position.y = player.getPosition().y + verticDistance;
 	}
 	
 	private float calculateHorizontalDistance(){

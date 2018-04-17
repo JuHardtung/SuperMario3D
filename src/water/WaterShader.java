@@ -9,8 +9,8 @@ import tools.Maths;
 
 public class WaterShader extends ShaderProgram {
 	 
-    private final static String VERTEX_FILE = "src/water/waterVertexShader.txt";
-    private final static String FRAGMENT_FILE = "src/water/waterFragmentShader.txt";
+    private final static String VERTEX_FILE = "/water/waterVertexShader.txt";
+    private final static String FRAGMENT_FILE = "/water/waterFragmentShader.txt";
  
     private int location_modelMatrix;
     private int location_viewMatrix;

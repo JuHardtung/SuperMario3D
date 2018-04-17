@@ -15,6 +15,9 @@ import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import tools.Maths;
 
+import static tools.Constants.TILE_SIZE;;
+
+
 public class WaterRenderer {
 	
 	private static final String DUDV_MAP = "waterDuDvMap";
@@ -48,7 +51,7 @@ public class WaterRenderer {
         for (WaterTile tile : water) {
             Matrix4f modelMatrix = Maths.createTransformationMatrix(
                     new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
-                    WaterTile.TILE_SIZE);
+                    TILE_SIZE);
             shader.loadModelMatrix(modelMatrix);
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
         }

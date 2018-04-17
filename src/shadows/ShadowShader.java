@@ -6,8 +6,8 @@ import shaders.ShaderProgram;
 
 public class ShadowShader extends ShaderProgram {
 	
-	private static final String VERTEX_FILE = "src/shadows/shadowVertexShader.txt";
-	private static final String FRAGMENT_FILE = "src/shadows/shadowFragmentShader.txt";
+	private static final String VERTEX_FILE = "/shadows/shadowVShader.txt";
+	private static final String FRAGMENT_FILE = "/shadows/shadowFShader.txt";
 	
 	private int location_mvpMatrix;
 
@@ -18,7 +18,6 @@ public class ShadowShader extends ShaderProgram {
 	@Override
 	protected void getAllUniformLocations() {
 		location_mvpMatrix = super.getUniformLocation("mvpMatrix");
-		
 	}
 	
 	protected void loadMvpMatrix(Matrix4f mvpMatrix){

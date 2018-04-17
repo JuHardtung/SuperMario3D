@@ -13,8 +13,10 @@ import org.lwjgl.util.vector.Vector4f;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.Player;
 import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
+import parallaxMappingRenderer.ParallaxMappingRenderer;
 import shaders.StaticShader;
 import shadows.ShadowMapMasterRenderer;
 import skybox.SkyboxRenderer;
@@ -26,11 +28,11 @@ public class MasterRenderer {
 	
 	public static final float FOV = 70;
 	public static final float NEAR_PLANE = 0.1f;
-	public static final float FAR_PLANE = 1000.0f;
+	public static final float FAR_PLANE = 10000.0f;
 	
-	public static final float RED = 0.37f;
-	public static final float GREEN = 0.58f;
-	public static final float BLUE = 0.98f;
+	public static  float RED = 0.37f;
+	public static  float GREEN = 0.58f;
+	public static  float BLUE = 0.98f;
 
 	
 	private Matrix4f projectionMatrix;
@@ -42,10 +44,13 @@ public class MasterRenderer {
 	private TerrainShader terrainShader = new TerrainShader();
 	
 	private NormalMappingRenderer normalMapRenderer;
+	private ParallaxMappingRenderer parallaxMapRenderer;
 	
 	
 	private HashMap<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
 	private HashMap<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel,List<Entity>>();
+	private HashMap<TexturedModel, List<Entity>> parallaxMapEntities = new HashMap<TexturedModel,List<Entity>>();
+
 
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 	
@@ -62,24 +67,28 @@ public class MasterRenderer {
 		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
 		this.shadowMapRenderer = new ShadowMapMasterRenderer(cam);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
+		parallaxMapRenderer = new ParallaxMappingRenderer(projectionMatrix);
 	}
 	
 	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
 
-	public void renderScene(List<Entity> entities, List<Entity> normalEntities, Camera camera, List<Light> lights, Vector4f clipPlane){
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Entity> parallaxEntities, Player player, Camera camera, List<Light> lights, Vector4f clipPlane){
 		for (Entity entity:entities){
 			processEntity(entity);
 		}
 		for (Entity entity:normalEntities){
 			processNormalMapEntity(entity);
 		}
+		for (Entity entity:parallaxEntities){
+			processParallaxMapEntity(entity);
+		}
+		processEntity(player);
 		render(lights, camera, clipPlane);
 	}
 
 	public void render(List<Light> lights, Camera camera, Vector4f clipPlane){
-	
 		prepare();
 		shader.start();
 		shader.loadClipPlane(clipPlane);
@@ -90,16 +99,18 @@ public class MasterRenderer {
 		shader.loadShadowDistance();
 		renderer.render(entities, shadowMapRenderer.getToShadowMapSpaceMatrix());
 		shader.stop();
+		skyboxRenderer.render(camera,RED, GREEN, BLUE);
 		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
+		parallaxMapRenderer.render(parallaxMapEntities, clipPlane, lights, camera);
 //		terrainShader.start();
 //		terrainShader.loadLight(sun);
 //		terrainShader.loadViewMatrix(camera);
 //		terrainRenderer.render(terrains);
 //		terrainShader.stop();
-		skyboxRenderer.render(camera,RED, GREEN, BLUE);
-		terrains.clear();
+//		terrains.clear();
 		entities.clear();
 		normalMapEntities.clear();
+		parallaxMapEntities.clear();
 		
 	}
 	
@@ -131,6 +142,18 @@ public class MasterRenderer {
 		}
 	}
 	
+	public void processParallaxMapEntity(Entity entity){
+		TexturedModel entityModel = entity.getModel();
+		List<Entity> batch = parallaxMapEntities.get(entityModel);
+		if(batch!=null){
+			batch.add(entity);
+		} else {
+			List<Entity> newBatch = new ArrayList<Entity>();
+			newBatch.add(entity);
+			parallaxMapEntities.put(entityModel, newBatch);
+		}
+	}
+	
 	public static void enableCulling(){
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glCullFace(GL11.GL_BACK);
@@ -140,13 +163,14 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
-	public void renderShadowMap(List<Entity> entityList, List<Entity>  entityNomalList, Light sun) {
+	public void renderShadowMap(List<Entity> entityList, List<Entity>  entityNomalList, Player player, Light sun) {
 		for(Entity entity : entityList) {
 			processEntity(entity);
 		}
 		for(Entity entity : entityNomalList) {
 			processEntity(entity);
 		}
+		processEntity(player);
 		shadowMapRenderer.render(entities, sun);
 		entities.clear();
 	}
@@ -159,7 +183,9 @@ public class MasterRenderer {
 		shader.cleanUp();
 		terrainShader.cleanUp();
 		shadowMapRenderer.cleanUp();
+		skyboxRenderer.cleanUp();
 		normalMapRenderer.cleanUp();
+		parallaxMapRenderer.cleanUp();
 	}
 	
 	public void prepare() {

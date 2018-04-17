@@ -4,6 +4,7 @@ public class ModelTexture {
 
 	private int textureID;
 	private int normalMap;
+	private int depthMap;
 	
 	private float shineDamper = 1;
 	private float reflectivity = 0;
@@ -27,7 +28,15 @@ public class ModelTexture {
         return normalMap;
     }
  
-    public void setNormalMap(int normalMap) {
+    public int getDepthMap() {
+		return depthMap;
+	}
+
+	public void setDepthMap(int depthMap) {
+		this.depthMap = depthMap;
+	}
+
+	public void setNormalMap(int normalMap) {
         this.normalMap = normalMap;
     }
     

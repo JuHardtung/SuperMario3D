@@ -10,14 +10,18 @@ import tools.Maths;
  
 public class SkyboxShader extends ShaderProgram{
  
-    private static final String VERTEX_FILE = "src/skybox/skyboxVertexShader.txt";
-    private static final String FRAGMENT_FILE = "src/skybox/skyboxFragmentShader.txt";
+    private static final String VERTEX_FILE = "/skybox/skyboxVShader.txt";
+    private static final String FRAGMENT_FILE = "/skybox/skyboxFShader.txt";
     
     private static final float ROTATE_SPEED = 0.3f;
      
     private int location_projectionMatrix;
     private int location_viewMatrix;
     private int location_fogColour;
+    private int location_cubeMap;
+    private int location_cubeMap2;
+    private int location_blendFactor;
+
     
     private float rotation = 0;
      
@@ -44,6 +48,18 @@ public class SkyboxShader extends ShaderProgram{
         location_projectionMatrix = super.getUniformLocation("projectionMatrix");
         location_viewMatrix = super.getUniformLocation("viewMatrix");
         location_fogColour = super.getUniformLocation("fogColor");
+        location_cubeMap = super.getUniformLocation("cubeMap");
+        location_cubeMap2 = super.getUniformLocation("cubeMap2");
+        location_blendFactor = super.getUniformLocation("blendFactor");
+    }
+    
+    public void connectTextureUnits() {
+    	super.loadInt(location_cubeMap, 0);
+    	super.loadInt(location_cubeMap2, 1);
+    }
+    
+    public void loadBlendFactor(float blend) {
+    	super.loadFloat(location_blendFactor, blend);
     }
     
     public void loadFogColour(float r, float g, float b){

@@ -10,12 +10,13 @@ import org.lwjgl.util.vector.Vector4f;
 import entities.Light;
 import shaders.ShaderProgram;
 
+import static tools.Constants.MAX_LIGHTS;;
+
+
 public class NormalMappingShader extends ShaderProgram{
-	
-	private static final int MAX_LIGHTS = 4;
-	
-	private static final String VERTEX_FILE = "src/normalMappingRenderer/normalMapVShader.txt";
-	private static final String FRAGMENT_FILE = "src/normalMappingRenderer/normalMapFShader.txt";
+		
+	private static final String VERTEX_FILE = "/normalMappingRenderer/normalMapVShader.txt";
+	private static final String FRAGMENT_FILE = "/normalMappingRenderer/normalMapFShader.txt";
 	
 	private int location_transformationMatrix;
 	private int location_projectionMatrix;

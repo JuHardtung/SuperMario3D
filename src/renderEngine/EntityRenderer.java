@@ -3,7 +3,6 @@ package renderEngine;
 import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -15,7 +14,6 @@ import models.RawModel;
 import models.TexturedModel;
 import shaders.StaticShader;
 import textures.ModelTexture;
-import textures.ModelTexturePack;
 import tools.Maths;
 
 public class EntityRenderer {

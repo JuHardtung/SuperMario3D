@@ -1,9 +1,9 @@
-/normalMappingObjConverter/
-/normalMappingRenderer/
 /renderEngine/
-/entities/
 /engineTester/
-/textures/
-/shaders/
+/res/
+/fontMeshCreator/
+/entities/
+/menuGeneration/
+/tools/
+/collision/
 /mapGeneration/
-/shadows/

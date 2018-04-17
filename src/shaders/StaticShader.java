@@ -9,16 +9,16 @@ import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.Light;
-import shadows.ShadowBox;
 import shadows.ShadowMapMasterRenderer;
 import tools.Maths;
 
+import static tools.Constants.MAX_LIGHTS;
+import static tools.Constants.SHADOW_DISTANCE;
+
 public class StaticShader extends ShaderProgram {
 	
-	private static final int MAX_LIGHTS = 4;
-
-	private static final String VERTEX_FILE = "src/shaders/vertexShader.txt";
-	private static final String FRAGMENT_FILE = "src/shaders/fragmentShader.txt";
+	private static final String VERTEX_FILE = "/shaders/vertexShader.txt";
+	private static final String FRAGMENT_FILE = "/shaders/fragmentShader.txt";
 	
 	private int location_transformationMatrix;
 	private int location_projectionMatrix;
@@ -65,7 +65,7 @@ public class StaticShader extends ShaderProgram {
 		location_plane = super.getUniformLocation("plane");
 		location_toShadowMapSpace = super.getUniformLocation("toShadowMapSpace");
 		location_shadowMap = super.getUniformLocation("shadowMap");
-		location_mapSize = super.getUniformLocation("mapSize");
+		location_mapSize = super.getUniformLocation("shadowMapSize");
 		location_shadowDistance = super.getUniformLocation("shadowDistance");
 		
 		location_lightPosition = new int[MAX_LIGHTS];
@@ -83,8 +83,7 @@ public class StaticShader extends ShaderProgram {
 	}
 	
 	public void loadShadowDistance() {
-		float shadowDistance = ShadowBox.getShadowDistance();
-		super.loadFloat(location_shadowDistance, shadowDistance);
+		super.loadFloat(location_shadowDistance, SHADOW_DISTANCE);
 	}
 	
 	public void loadMapSize() {
@@ -104,7 +103,7 @@ public class StaticShader extends ShaderProgram {
 		super.loadFloat(location_numberOfRows, numberOfRows);
 	}
 	
-	public  void loadOffset(float x, float y) {
+	public void loadOffset(float x, float y) {
 		super.load2DVector(location_offset, new Vector2f(x, y));
 	}
 	

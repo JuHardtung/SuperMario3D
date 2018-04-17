@@ -1,17 +1,11 @@
 package fontMeshCreator;
  
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import buttons.IButton;
 import fontRendering.TextMaster;
-import guis.GuiTexture;
-import renderEngine.DisplayManager;
  
 /**
  * Represents a piece of text in the game.

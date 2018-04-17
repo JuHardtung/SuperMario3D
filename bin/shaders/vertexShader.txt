@@ -27,7 +27,7 @@ uniform vec2 offset;
 
 const float density = 0.0012;
 const float gradient = 1.5;
-const float transitionDistance = 600.0;
+const float transitionDistance = 900.0;
 
 uniform vec4 plane;
 

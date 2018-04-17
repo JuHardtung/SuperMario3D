@@ -8,7 +8,7 @@ import entities.Camera;
 
 public class Maths {
 
-	
+	//transformation for 2D 
 	public static Matrix4f createTransformationMatrix(Vector2f translation, Vector2f scale){
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();
@@ -17,6 +17,7 @@ public class Maths {
 		return matrix;
 	}
 	
+	//transformation for 3D
 	public static Matrix4f createTransformationMatrix(Vector3f translation, float rx, float ry, float rz, float scale){
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();

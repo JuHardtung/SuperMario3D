@@ -1,30 +1,24 @@
 package menuGeneration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import entities.Entity;
 import fontMeshCreator.FontType;
 import fontMeshCreator.GUIText;
-import fontRendering.TextMaster;
-import renderEngine.DisplayManager;
 import renderEngine.Loader;
+import renderEngine.MapLoader;
 
 public class MenuOptions {
 	
 	private Loader loader = new Loader();
+	private MapLoader maploader = new MapLoader();
 	
-	private FontType marioFont = new FontType(loader.loadFontTextureAtlas("/fonts/superMarioFont2"), new File("res/fonts/superMarioFont2.fnt"));
+	private FontType marioFont = new FontType(loader.loadFontTextureAtlas("fonts/superMarioFont2"),"fonts/superMarioFont2");
 	private List<GUIText> allMenus = new ArrayList<GUIText>();
 	private List<GUIText> allLevelMenus = new ArrayList<GUIText>();
 	private int showGuiPart = 1;
-
-
-
-	
 	
 	public List<GUIText> generateESCMenu() {
 		
@@ -147,6 +141,7 @@ public class MenuOptions {
 			@Override
 			public void onClick() {
 				setClicked(true);
+				System.out.println("BOI LEVEL 1");				
 
 			}
 		};
@@ -170,7 +165,8 @@ public class MenuOptions {
 			@Override
 			public void onClick() {
 				setClicked(true);
-
+				System.out.println("BOI LEVEL 2");
+				
 			}
 		};
 		

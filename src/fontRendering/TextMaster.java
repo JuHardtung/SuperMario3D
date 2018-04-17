@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL30;
-
 import fontMeshCreator.FontType;
 import fontMeshCreator.GUIText;
 import fontMeshCreator.TextMeshData;

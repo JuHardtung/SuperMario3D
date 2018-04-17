@@ -7,12 +7,16 @@ import models.TexturedModel;
 public class Entity {
 	private TexturedModel model;
 	private Vector3f position;
+	private Vector3f oldPosition;
 	private float rotX, rotY, rotZ;
 	private float scale;
+	private float xAxisOffset, yAxisOffset, zAxisOffset;
+	
+	private float xMin, xMax, yMin, yMax, zMin, zMax;
 	
 	private int textureIndex = 0;
 	
-	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, float xAxisOffset, float yAxisOffset, float zAxisOffset) {
 		super();
 		this.model = model;
 		this.position = position;
@@ -20,9 +24,13 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.xAxisOffset = xAxisOffset;
+		this.yAxisOffset = yAxisOffset;
+		this.zAxisOffset = zAxisOffset;
+
 	}
 	
-	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale, float xAxisOffset, float yAxisOffset, float zAxisOffset) {
 		super();
 		this.textureIndex = index;
 		this.model = model;
@@ -31,6 +39,9 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.xAxisOffset = xAxisOffset;
+		this.yAxisOffset = yAxisOffset;
+		this.zAxisOffset = zAxisOffset;
 	}
 	
 	
@@ -71,6 +82,24 @@ public class Entity {
 	public void setPosition(Vector3f position) {
 		this.position = position;
 	}
+	
+	public Vector3f getMaxBounds() {
+		
+		xMax = getPosition().x + xAxisOffset;
+		yMax = getPosition().y + yAxisOffset;
+		zMax = getPosition().z + zAxisOffset;
+			
+		return new Vector3f(xMax, yMax, zMax);
+	}
+	
+	public Vector3f getMinBounds() {
+		
+		xMin = getPosition().x - xAxisOffset;
+		yMin = getPosition().y - yAxisOffset;
+		zMin = getPosition().z - zAxisOffset;
+			
+		return new Vector3f(xMin, yMin, zMin);
+	}
 
 	public float getRotX() {
 		return rotX;
@@ -103,9 +132,12 @@ public class Entity {
 	public void setScale(float scale) {
 		this.scale = scale;
 	}
-	
-	
-	
-	
 
+	public Vector3f getOldPosition() {
+		return oldPosition;
+	}
+
+	public void setOldPosition(Vector3f oldPosition) {
+		this.oldPosition = oldPosition;
+	}
 }
